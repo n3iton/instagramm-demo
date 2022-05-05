@@ -1,13 +1,16 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.UserDTO;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.ERole;
 import com.example.demo.exception.UserExistsException;
 import com.example.demo.payload.request.SignUpRequest;
 import com.example.demo.repository.UserRepository;
+import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,4 +49,30 @@ public class UserService {
           + "Check credentials");
     }
   }
+
+  public User updateUser(UserDTO userDTO, Principal principal) {
+    User user = getUserByPrincipal(principal);
+    user.setName(userDTO.getFirstname());
+    user.setLastName(userDTO.getLastname());
+    user.setBio(userDTO.getBio());
+
+    return userRepository.save(user);
+  }
+
+  public User getCurrentUser(Principal principal) {
+    return getUserByPrincipal(principal);
+  }
+
+  public User getUserById(Long userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+  }
+
+  private User getUserByPrincipal(Principal principal) {
+    String username = principal.getName();
+    return userRepository.findUserByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("Username " + username + " not found"));
+  }
+
+
 }

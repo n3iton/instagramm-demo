@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         User userDetails = customUserDetailsService.loadUserById(userId);
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            userDetails, null, Collections.EMPTY_LIST
+            userDetails, null, Collections.emptyList()
         );
 
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -47,6 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       }
     } catch (Exception e) {
       LOG.error("Could not set user authentication");
+      e.printStackTrace();
     }
 
     filterChain.doFilter(request, response);
